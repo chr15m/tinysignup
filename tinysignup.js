@@ -4,6 +4,7 @@ function chkurl(s) { return document.location.href.indexOf(s) != -1; }
 
 var script = document.currentScript;
 var href = script.src.split("?");
+var q = parseQuery(href[1]);
 
 var div = nu("div", {"className": "tinysignup"});
 
@@ -15,7 +16,8 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   });
 } else {
   var form = nu("form", {"method": "post", "action": href[0]});
-  form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": href[1].replace("list=", "")}));
+  form.appendChild(nu("p", {}, q["message"] || "Sign up to my mailing list:"));
+  form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": q["list"]}));
   form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
   form.appendChild(nu("button", {"type": "submit"}, "✔"));
   form.onsubmit = function(ev) {
@@ -37,6 +39,7 @@ function submitForm(ev, form, callback) {
   post(url, data, callback);
 }
 
+// https://gist.github.com/Xeoncross/7663273
 function post(url, data, callback) {
   try {
     x = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
@@ -51,4 +54,15 @@ function post(url, data, callback) {
   } catch (e) {
     window.console && console.log(e);
   }
+}
+
+// https://stackoverflow.com/a/13419367/2131094
+function parseQuery(queryString) {
+    var query = {};
+    var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+    for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].split('=');
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+    }
+    return query;
 }
