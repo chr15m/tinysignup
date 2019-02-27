@@ -1,28 +1,31 @@
 // https://news.ycombinator.com/hn.js
 function nu(tag, attrs, text) { var e = document.createElement(tag); for(var a in attrs) { e.setAttribute(a, attrs[a]); }; e.innerHTML = text || ""; return e; }
+function chkurl(s) { return document.location.href.indexOf(s) != -1; }
 
 var script = document.currentScript;
 var href = script.src.split("?");
 
 var div = nu("div", {"className": "tinysignup"});
 
-if (document.location.href.indexOf("&v=") == -1) {
+if (chkurl("&v=") || chkurl("&unsubscribe=")) {
+  div.innerHTML = "";
+  div.appendChild(nu("div", {"className": "spinner"}));
+  post(href[0], document.location.search.substring(1), function(response) {
+    div.innerHTML = response;
+  });
+} else {
   var form = nu("form", {"method": "post", "action": href[0]});
   form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": href[1].replace("list=", "")}));
-  form.appendChild(nu("input", {"type": "email", "placeholder": "Enter email", "name": "email"}));
-  form.appendChild(nu("button", {"type": "submit"}, "Sign up"));
+  form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
+  form.appendChild(nu("button", {"type": "submit"}, "✔"));
   form.onsubmit = function(ev) {
-    div.innerHTML = "Sending subscription verification...";
+    div.innerHTML = "";
+    div.appendChild(nu("div", {"className": "spinner"}));
     submitForm(ev, form, function(response) {
       div.innerHTML = response;
     });
   };
   div.appendChild(form);
-} else {
-  div.innerHTML = "Verifying subscription...";
-  post(href[0], document.location.search.substring(1), function(response) {
-    div.innerHTML = response;
-  });
 }
 
 script.parentNode.insertBefore(div, script.nextSibling);

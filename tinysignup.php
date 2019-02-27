@@ -23,22 +23,26 @@ if (isset($_GET["list"])) {
   }
 } elseif (isset($_POST["v"]) && isset($_POST["email"]) && isset($_POST["list"])) {
   header("Content-type: application/json");
-  if (check_params($_POST, $config) && check_verification($_POST, $config)) {
-    add_email($_POST);
-    print("You're now signed up for '" . $config["lists"][$_POST["list"]] . "'.");
+  if (check_params($_POST, $config) && check_verification($_POST, $config) && add_email($_POST)) {
+    print(config_string($config, "success", "You're now signed up for") . " '" . $config["lists"][$_POST["list"]] . "'.");
   } else {
-    print("Sorry, an error occured.");
+    print(config_string($config, "error", "Sorry, an error occured."));
+  }
+} elseif (isset($_POST["unsubscribe"]) && isset($_POST["email"]) && isset($_POST["list"])) {
+  if (check_params($_POST, $config) && check_subscription($_POST, $config) && remove_email($_POST, $config)) {
+    print(config_string($config, "unsubscribed", "You've been successfully unsubscribed from") . " '" . $config["lists"][$_POST["list"]] . "'.");
+  } else {
+    print(config_string($config, "error", "Sorry, an error occurred."));
   }
 } elseif (isset($_POST["email"]) && isset($_POST["list"]) && !isset($_POST["v"])) {
   header("Content-type: application/json");
   if (check_params($_POST, $config) && send_verification($_POST, $config)) {
-    print("Please check your inbox to confirm your subscription. (and your spam folder!)");
+    print(config_string($config, "confirm", "Please check your inbox to confirm your subscription. (and your spam folder!)"));
   } else {
-    print("Sorry, an error occurred.");
+    print(config_string($config, "error", "Sorry, an error occurred."));
   }
-  // TODO: unsubscribe
-  // TODO: download CSV (authenticated)
 } else {
+  // TODO: download CSV (authenticated)
   header("Content-type: text/plain");
   print_r($_REQUEST);
 }
@@ -51,6 +55,13 @@ function check_params($params, $config) {
   $listname = $config["lists"][$list];
   see("check_params", $params["email"], $email, $listname);
   return (isset($listname) && $email);
+}
+
+function check_subscription($params, $config) {
+  $fname = "list-" . $params["list"];
+  $list = loaddata($fname);
+  $list = $list ? $list : Array();
+  return isset($list[$params["email"]]) && $list[$params["email"]][1] == $params["unsubscribe"];
 }
 
 function send_verification($params, $config) {
@@ -92,6 +103,16 @@ function add_email($params) {
     see("add_email", $params["email"], "(skipping duplicate)");
   }
   dumpdata($list, $fname);
+  return True;
+}
+
+function remove_email($params, $config) {
+  $fname = "list-" . $params["list"];
+  $list = loaddata($fname);
+  $list = $list ? $list : Array();
+  unset($list[$params["email"]]);
+  dumpdata($list, $fname);
+  return True;
 }
 
 function make_hmac_qs($params) {
@@ -100,6 +121,14 @@ function make_hmac_qs($params) {
 
 function hash_hmac_qs($qs, $config) {
   return substr(hash_hmac("sha256", $qs, $config["secret"]), 0, 16);
+}
+
+function config_string($config, $name, $default) {
+  if (isset($config["strings"][$name])) {
+    return $config["strings"][$name];
+  } else {
+    return $default;
+  }
 }
 
 /*** Utility functions ***/
