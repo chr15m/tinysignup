@@ -2,14 +2,14 @@
 
 /*** Config load or create default ***/
 
-$config = loaddata("config");
+$config = loaddata("tinysignup-config");
 if (!$config) {
   $config = Array(
     "secret" => hash("sha256", openssl_random_pseudo_bytes(32)),
     "lists" => Array("default" => "Default list"),
     "from" => "your@email.com",
   );
-  dumpdata($config, "config");
+  dumpdata($config, "tinysignup-config");
 }
 
 /*** Routes ***/
