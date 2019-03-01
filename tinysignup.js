@@ -6,11 +6,11 @@ var script = document.currentScript;
 var href = script.src.split("?");
 var q = parseQuery(href[1]);
 
-var div = nu("div", {"className": "tinysignup"});
+var div = nu("div", {"class": "tinysignup"});
 
 if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   div.innerHTML = "";
-  div.appendChild(nu("div", {"className": "spinner"}));
+  div.appendChild(nu("div", {"class": "spinner"}));
   post(href[0], document.location.search.substring(1), function(response) {
     div.innerHTML = response;
   });
@@ -22,7 +22,7 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   form.appendChild(nu("button", {"type": "submit"}, "✔"));
   form.onsubmit = function(ev) {
     div.innerHTML = "";
-    div.appendChild(nu("div", {"className": "spinner"}));
+    div.appendChild(nu("div", {"class": "spinner"}));
     submitForm(ev, form, function(response) {
       div.innerHTML = response;
     });
