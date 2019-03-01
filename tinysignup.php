@@ -25,6 +25,11 @@ if (isset($_GET["list"])) {
   header("Content-type: application/json");
   if (check_params($_POST, $config) && check_verification($_POST, $config) && add_email($_POST)) {
     print(config_string($config, "success", "You're now signed up for") . " '" . $config["lists"][$_POST["list"]] . "'.");
+    mail($config["from"],
+      "New subscription to '" . $config["lists"][$_POST["list"]] . "'",
+      $_POST["email"] . " has subscribed.",
+      "From: " . $config["from"]
+    );
   } else {
     print(config_string($config, "error", "Sorry, an error occured."));
   }
