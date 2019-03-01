@@ -21,11 +21,16 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
   form.appendChild(nu("button", {"type": "submit"}, "✔"));
   form.onsubmit = function(ev) {
-    div.innerHTML = "";
-    div.appendChild(nu("div", {"class": "spinner"}));
-    submitForm(ev, form, function(response) {
-      div.innerHTML = response;
-    });
+    if (form.email.value) {
+      div.innerHTML = "";
+      div.appendChild(nu("div", {"class": "spinner"}));
+      submitForm(ev, form, function(response) {
+        div.innerHTML = "";
+        div.appendChild(nu("div", {"class": "message"}, response));
+      });
+    } else {
+      ev.preventDefault();
+    }
   };
   div.appendChild(form);
 }
