@@ -12,7 +12,8 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   div.innerHTML = "";
   div.appendChild(nu("div", {"class": "spinner"}));
   post(href[0], document.location.search.substring(1), function(response) {
-    div.innerHTML = response;
+    div.innerHTML = "";
+    div.appendChild(nu("div", {"class": "message"}, response));
   });
 } else {
   var form = nu("form", {"method": "post", "action": href[0]});
