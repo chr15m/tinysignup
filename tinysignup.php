@@ -51,7 +51,6 @@ if (isset($_GET["list"])) {
 } else {
   // TODO: download CSV (authenticated)
   header("Content-type: text/plain");
-  print_r($_REQUEST);
 }
 
 /*** API functions ***/
@@ -89,8 +88,7 @@ function make_verification($params, $config) {
   $params["n"] = substr(hash("sha256", openssl_random_pseudo_bytes(32)), 0, 8);
   $qs = make_hmac_qs($params);
   see("make_verification", $qs, $params);
-  $ref = $_SERVER["HTTP_REFERER"];
-  return ($ref ? $ref : my_url()) . $qs . "&v=" . hash_hmac_qs($qs, $config);
+  return my_url() . $qs . "&v=" . hash_hmac_qs($qs, $config);
 }
 
 function check_verification($params, $config) {
@@ -161,10 +159,13 @@ function sanitize_filename($name) {
 
 // https://stackoverflow.com/questions/2236873/getting-the-full-url-of-the-current-page-php
 function my_url() { 
-    $s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
-    $protocol = strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/") . $s;
-    $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
-    return $protocol."://".$_SERVER['SERVER_NAME'].$port.$_SERVER['REQUEST_URI'];
+  $ref = isset($_SERVER['HTTP_REFERER']) ? explode("?", $_SERVER['HTTP_REFERER'])[0] : NULL;
+  if ($ref) return $ref;
+  $s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+  $protocol = strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/") . $s;
+  $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+  $req = explode("?", $_SERVER['REQUEST_URI'])[0];
+  return $protocol."://".$_SERVER['SERVER_NAME'].$port.$req;
 }
 function strleft($s1, $s2) { return substr($s1, 0, strpos($s1, $s2)); }
 
