@@ -27,11 +27,7 @@ if (isset($_GET["list"])) {
   header("Content-type: application/json");
   if (check_params($_POST, $config) && check_verification($_POST, $config) && add_email($_POST)) {
     print(config_string($config, "success", "You're now signed up for") . " '" . $config["lists"][$_POST["list"]] . "'.");
-    mail($config["from"],
-      "New subscription to '" . $config["lists"][$_POST["list"]] . "'",
-      $_POST["email"] . " has subscribed.",
-      "From: " . $config["from"]
-    );
+    send_notifications($_POST, $config);
   } else {
     print(config_string($config, "error", "Sorry, an error occured."));
   }
@@ -80,6 +76,32 @@ function send_verification($params, $config) {
     make_verification($params, $config) . "\n\n" .
     "If you didn't subscribe to this list you may ignore this email.",
     "From: " . $config["from"]
+  );
+  return true;
+}
+
+function send_notifications($params, $config) {
+  $email = $params["email"];
+  $list = $params["list"];
+  $listname = $config["lists"][$list];
+
+  // send notification to list owner
+  mail($config["from"],
+    "New subscription to '" . $listname . "'",
+    $email . " has subscribed.",
+    "From: " . $config["from"]
+  );
+
+  $unsubscribe = my_url() . "?email=" . $email . "&list=" . $list . "&unsubscribe=" . $params["n"];
+
+  // send notification to subscriber
+  mail($email,
+    $listname . ": You're subscribed.",
+    'Your subscription was successful. Thanks for subscribing to "' . $listname . '".' . "\n\n" .
+    'If you want to unsubscribe you can use this link any time in the future:' . "\n" .
+    $unsubscribe . "\n\n",
+    "From: " . $config["from"] . "\n" .
+    "List-Unsubscribe: " . "<" . $unsubscribe . ">"
   );
   return true;
 }
