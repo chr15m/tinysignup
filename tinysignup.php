@@ -98,7 +98,7 @@ function send_notifications($params, $config) {
   mail($email,
     $listname . ": You're subscribed.",
     'Your subscription was successful. Thanks for subscribing to "' . $listname . '".' . "\n\n" .
-    'If you want to unsubscribe you can use this link any time in the future:' . "\n" .
+    'If you want to unsubscribe you can use this link any time in the future:' . "\n\n" .
     $unsubscribe . "\n\n",
     "From: " . $config["from"] . "\n" .
     "List-Unsubscribe: " . "<" . $unsubscribe . ">"
