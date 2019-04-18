@@ -54,7 +54,7 @@ if (isset($_GET["list"])) {
     echo("email,joined,nonce,unsubscribe\r\n");
     foreach ($list as $email => $config) {
       $url = $config[3];
-      echo($email . "," . $config[0] . "," . $config[1] . "," . str_replace("tinysignup.php", "", make_unsubscribe_url($url ? $url : my_url(), urlencode($email), $_GET["csv"], $config[1])) . "\r\n");
+      echo($email . "," . $config[0] . "," . $config[1] . "," . str_replace("tinysignup.php", "", make_unsubscribe_url($url ? $url : my_url(), $email, $_GET["csv"], $config[1])) . "\r\n");
     }
   } else {
     echo("No such list.");
@@ -98,7 +98,7 @@ function send_verification($params, $config) {
 }
 
 function make_unsubscribe_url($url, $email, $list, $n) {
-  return $url . "?email=" . $email . "&list=" . $list . "&unsubscribe=" . $n;
+  return $url . "?email=" . urlencode($email) . "&list=" . $list . "&unsubscribe=" . $n;
 }
 
 function send_notifications($params, $config) {
