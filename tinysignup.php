@@ -44,9 +44,22 @@ if (isset($_GET["list"])) {
   } else {
     print(config_string($config, "error", "Sorry, an error occurred."));
   }
+} elseif (isset($_GET["csv"])) {
+  // TODO: authenticate this
+  header("Content-type: text/csv");
+  header("Content-Disposition: attachment;filename=" + $_GET["csv"] + ".csv");
+  $fname = "list-" . $_GET["csv"];
+  $list = loaddata($fname);
+  $list = $list ? $list : Array();
+  echo("email,joined,nonce,unsubscribe\r\n");
+  foreach ($list as $email => $config)  {
+    $url = $config[3];
+    echo($email . "," . $config[0] . "," . $config[1] . "," . str_replace("tinysignup.php", "", make_unsubscribe_url($url ? $url : my_url(), urlencode($email), $_GET["csv"], $config[1])) . "\r\n");
+  }
 } else {
-  // TODO: download CSV (authenticated)
+  // TODO: output HTML interface
   header("Content-type: text/plain");
+  echo("Nothing to see here.");
 }
 
 /*** API functions ***/
@@ -63,6 +76,7 @@ function check_subscription($params, $config) {
   $fname = "list-" . $params["list"];
   $list = loaddata($fname);
   $list = $list ? $list : Array();
+  see("check_subscription", $list[$params["email"]], $params["unsubscribe"]);
   return isset($list[$params["email"]]) && $list[$params["email"]][1] == $params["unsubscribe"];
 }
 
@@ -80,6 +94,10 @@ function send_verification($params, $config) {
   return true;
 }
 
+function make_unsubscribe_url($url, $email, $list, $n) {
+  return $url . "?email=" . $email . "&list=" . $list . "&unsubscribe=" . $n;
+}
+
 function send_notifications($params, $config) {
   $email = $params["email"];
   $list = $params["list"];
@@ -92,7 +110,7 @@ function send_notifications($params, $config) {
     "From: " . $config["from"]
   );
 
-  $unsubscribe = my_url() . "?email=" . $email . "&list=" . $list . "&unsubscribe=" . $params["n"];
+  $unsubscribe = make_unsubscribe_url(my_url(), $email, $list, $params["n"]);
 
   // send notification to subscriber
   mail($email,
@@ -125,7 +143,7 @@ function add_email($params) {
   $list = $list ? $list : Array();
   if (!isset($list[$params["email"]])) {
     see("add_email", $params["email"]);
-    $list[$params["email"]] = Array(date("c"), $params["n"], $params["v"]);
+    $list[$params["email"]] = Array(date("c"), $params["n"], $params["v"], my_url());
   } else {
     see("add_email", $params["email"], "(skipping duplicate)");
   }
