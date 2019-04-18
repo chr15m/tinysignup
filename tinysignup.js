@@ -10,11 +10,13 @@ var div = nu("div", {"class": "tinysignup"});
 
 if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   div.innerHTML = "";
-  div.appendChild(nu("div", {"class": "spinner"}));
+  div.appendChild(nu("div", {"class": "spinner top"}));
   post(href[0], document.location.search.substring(1), function(response) {
     div.innerHTML = "";
-    div.appendChild(nu("div", {"class": "message"}, response));
+    div.appendChild(nu("div", {"class": "message top"}, response));
   });
+  // put feedback at the top of the page
+  document.body.insertAdjacentElement("afterbegin", div);
 } else {
   var form = nu("form", {"method": "post", "action": href[0]});
   form.appendChild(nu("p", {}, q["message"] || "Sign up to my mailing list:"));
@@ -34,9 +36,9 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
     }
   };
   div.appendChild(form);
+  // put feedback where the script tag is
+  script.parentNode.insertBefore(div, script.nextSibling);
 }
-
-script.parentNode.insertBefore(div, script.nextSibling);
 
 function submitForm(ev, form, callback) {
   ev.preventDefault();
