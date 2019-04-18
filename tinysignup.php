@@ -46,15 +46,18 @@ if (isset($_GET["list"])) {
   }
 } elseif (isset($_GET["csv"])) {
   // TODO: authenticate this
-  header("Content-type: text/csv");
-  header("Content-Disposition: attachment;filename=" + $_GET["csv"] + ".csv");
   $fname = "list-" . $_GET["csv"];
   $list = loaddata($fname);
-  $list = $list ? $list : Array();
-  echo("email,joined,nonce,unsubscribe\r\n");
-  foreach ($list as $email => $config)  {
-    $url = $config[3];
-    echo($email . "," . $config[0] . "," . $config[1] . "," . str_replace("tinysignup.php", "", make_unsubscribe_url($url ? $url : my_url(), urlencode($email), $_GET["csv"], $config[1])) . "\r\n");
+  if ($list) {
+    header("Content-type: text/csv");
+    //header("Content-Disposition: attachment;filename=" + $_GET["csv"] + ".csv");
+    echo("email,joined,nonce,unsubscribe\r\n");
+    foreach ($list as $email => $config) {
+      $url = $config[3];
+      echo($email . "," . $config[0] . "," . $config[1] . "," . str_replace("tinysignup.php", "", make_unsubscribe_url($url ? $url : my_url(), urlencode($email), $_GET["csv"], $config[1])) . "\r\n");
+    }
+  } else {
+    echo("No such list.");
   }
 } else {
   // TODO: output HTML interface
