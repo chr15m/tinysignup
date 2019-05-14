@@ -29,6 +29,8 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
 } else {
   if (config("form")) {
     var form = document.getElementById(config("form"));
+    if (!form.getAttribute("action")) form.setAttribute("action", href[0]);
+    if (!form.getAttribute("method")) form.setAttribute("method", "post");
   } else {
     var form = nu("form", {"method": "post", "action": href[0]});
     form.appendChild(nu("p", {}, q["message"] || config("message") || "Sign up to my mailing list:"));
