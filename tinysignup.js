@@ -6,7 +6,16 @@ var script = document.currentScript;
 var href = script.src.split("?");
 var q = parseQuery(href[1]);
 
-var div = nu("div", {"class": "tinysignup"});
+function config(key, defaultvalue) {
+  var defaultvalue = defaultvalue || null;
+  return script.getAttribute("data-" + key) || defaultvalue;
+}
+
+if (config("div")) {
+  var div = document.getElementById(config("div"));
+} else {
+  var div = nu("div", {"class": "tinysignup"});
+}
 
 if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   div.innerHTML = "";
@@ -18,11 +27,16 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
   // put feedback at the top of the page
   document.body.insertAdjacentElement("afterbegin", div);
 } else {
-  var form = nu("form", {"method": "post", "action": href[0]});
-  form.appendChild(nu("p", {}, q["message"] || "Sign up to my mailing list:"));
-  form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": q["list"]}));
-  form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
-  form.appendChild(nu("button", {"type": "submit"}, "✔"));
+  if (config("form")) {
+    var form = document.getElementById(config("form"));
+  } else {
+    var form = nu("form", {"method": "post", "action": href[0]});
+    form.appendChild(nu("p", {}, q["message"] || config("message") || "Sign up to my mailing list:"));
+    form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": q["list"]}));
+    form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
+    form.appendChild(nu("button", {"type": "submit"}, "✔"));
+    div.appendChild(form);
+  }
   form.onsubmit = function(ev) {
     if (form.email.value) {
       div.innerHTML = "";
@@ -35,9 +49,10 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
       ev.preventDefault();
     }
   };
-  div.appendChild(form);
   // put feedback where the script tag is
-  script.parentNode.insertBefore(div, script.nextSibling);
+  if (!config("div")) {
+    script.parentNode.insertBefore(div, script.nextSibling);
+  }
 }
 
 function submitForm(ev, form, callback) {
