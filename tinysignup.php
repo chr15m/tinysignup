@@ -50,7 +50,7 @@ if (isset($_GET["list"])) {
   $list = loaddata($fname);
   if ($list) {
     header("Content-type: text/csv");
-    //header("Content-Disposition: attachment;filename=" + $_GET["csv"] + ".csv");
+    header("Content-Disposition: attachment;filename=" . $_GET["csv"] . ".csv");
     echo("email,joined,nonce,unsubscribe\r\n");
     foreach ($list as $email => $config) {
       $url = $config[3];
