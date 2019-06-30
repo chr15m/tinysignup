@@ -1,10 +1,13 @@
-Single-script newsletter signup.
+# DO NOT RELEASE UNTIL CSV IS AUTHED
 
- * CSV storage.
+Newsletter signup in a single script.
 
 ## Install & configure
 
+ * Copy `tinysignup.php`, `tinysignup-config-data.php` and `tinysignup.js` up onto your server.
+ * Edit `tinysignup-config-data.php`.
 
+TODO: note about where signups are stored.
 
 ## Use
 
@@ -33,4 +36,7 @@ If you want to completely customise the form which is shown, use the `data-form`
 
 ## Mail
 
-## Unsubscribe
+ * Download the CSV like this: `https://YOUR-SERVER/tinysignup.php?csv=invention`
+ * Perform mail merge.
+ * X-List-unsubsribe header info.
+
