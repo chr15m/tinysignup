@@ -8,6 +8,7 @@ if (!$config) {
     "secret" => hash("sha256", openssl_random_pseudo_bytes(32)),
     "lists" => Array("default" => "Default list"),
     "from" => "your@email.com",
+    "passwords" => Array("default" => "SECRETPASSWORDCHANGEME"),
   );
   dumpdata($config, "tinysignup-config");
 }
@@ -45,7 +46,10 @@ if (isset($_GET["list"])) {
     print(config_string($config, "error", "Sorry, an error occurred."));
   }
 } elseif (isset($_GET["csv"])) {
-  // TODO: authenticate this
+  if (!isset($config["passwords"][$_GET["csv"]]) || $config["passwords"][$_GET["csv"]] != $_GET["p"]) {
+    sleep(3);
+    die("Authentication failed.");
+  }
   $fname = "list-" . $_GET["csv"];
   $list = loaddata($fname);
   if ($list) {

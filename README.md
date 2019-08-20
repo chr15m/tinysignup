@@ -35,7 +35,7 @@ If you want to completely customise the form which is shown, use the `data-form`
 
 TODO: note about where signups are stored.
 
- * Download the CSV like this: `https://YOUR-SERVER/tinysignup.php?csv=invention`
+ * Download the CSV like this: `https://YOUR-SERVER/tinysignup.php?csv=listname&p=secretpassword`
  * Perform mail merge.
  * X-List-unsubsribe header info.
 
