@@ -35,6 +35,7 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
     var form = nu("form", {"method": "post", "action": href[0]});
     form.appendChild(nu("p", {}, q["message"] || config("message") || "Sign up to my mailing list:"));
     form.appendChild(nu("input", {"type": "hidden", "name": "list", "value": q["list"]}));
+    form.appendChild(nu("input", {"aria-hidden": "true", "tabindex": "-1", "name": "fullname", "placeholder": "Full name...", "style": "position:absolute;left:-10000px;display:none;"}));
     form.appendChild(nu("input", {"type": "email", "placeholder": "Email address...", "name": "email"}));
     form.appendChild(nu("button", {"type": "submit"}, "✔"));
     div.appendChild(form);
@@ -59,7 +60,7 @@ if (chkurl("&v=") || chkurl("&unsubscribe=")) {
 
 function submitForm(ev, form, callback) {
   ev.preventDefault();
-  var data = "list=" + encodeURIComponent(form.list.value) + "&email="  + encodeURIComponent(form.email.value);
+  var data = "list=" + encodeURIComponent(form.list.value) + "&email=" + encodeURIComponent(form.email.value) + "&fullname=" + encodeURIComponent(form.fullname.value);
   url = form.action;
   post(url, data, callback);
 }

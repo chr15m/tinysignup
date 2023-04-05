@@ -90,14 +90,17 @@ function check_subscription($params, $config) {
 function send_verification($params, $config) {
   $email = $params["email"];
   $list = $params["list"];
+  $decoy = $params["fullname"];
   $listname = $config["lists"][$list];
-  mail($email,
-    $listname . ": Please confirm subscription",
-    'To confirm your subscription to "' . $listname . '" please click the verification link:' . "\n\n" .
-    make_verification($params, $config) . "\n\n" .
-    "If you didn't subscribe to this list you may ignore this email.",
-    "From: " . $config["from"]
-  );
+  if (empty($decoy)) {
+    mail($email,
+      $listname . ": Please confirm subscription",
+      'To confirm your subscription to "' . $listname . '" please click the verification link:' . "\n\n" .
+      make_verification($params, $config) . "\n\n" .
+      "If you didn't subscribe to this list you may ignore this email.",
+      "From: " . $config["from"]
+    );
+  }
   return true;
 }
 
